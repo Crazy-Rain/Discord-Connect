@@ -5,6 +5,31 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.0.3] - 2025-01-XX
+
+### Fixed
+- **Critical**: Enhanced CSRF token error handling and diagnostics
+  - Added defensive checks for `getRequestHeaders()` availability
+  - Added fallback header generation if `getRequestHeaders()` is unavailable
+  - Extension now detects and logs when CSRF token functionality is missing
+  - Save/load operations now provide detailed error feedback to users
+
+### Added
+- **Diagnostic Tools**: New CSRF token availability checker runs on extension initialization
+  - Logs detailed diagnostic information to browser console
+  - Shows which headers are available and being used
+  - Helps identify SillyTavern version compatibility issues
+- **User Feedback**: Enhanced error notifications
+  - Toast notifications when settings save fails
+  - Specific error messages for CSRF token issues (403 errors)
+  - Console logging with "Discord Connect:" prefix for easy filtering
+  
+### Changed
+- `loadSettings()` now logs detailed error information and response status
+- `saveSettings()` now validates response status and shows user notifications on failure
+- Better error messages with actionable steps for users
+- Enhanced troubleshooting documentation with step-by-step debugging guide
+
 ## [1.0.2] - 2025-01-XX
 
 ### Added

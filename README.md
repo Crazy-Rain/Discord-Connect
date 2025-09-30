@@ -152,6 +152,21 @@ The Discord Connect Server provides the following endpoints:
 
 ## Troubleshooting
 
+### CSRF Token Errors
+
+If you see "Invalid CSRF token" errors in the SillyTavern console:
+
+1. **Check browser console diagnostics** (F12 → Console tab)
+   - Look for `=== Discord Connect CSRF Diagnostic ===`
+   - Verify `getRequestHeaders available: true`
+   - If false, update SillyTavern to the latest version
+
+2. **Hard refresh** (Ctrl+Shift+R or Cmd+Shift+R)
+
+3. **Re-enter your settings** and watch for error notifications
+
+For detailed troubleshooting, see [TROUBLESHOOTING.md](TROUBLESHOOTING.md).
+
 ### Bot doesn't connect
 - Verify your bot token is correct
 - Ensure the bot has been invited to your Discord server

@@ -21,13 +21,58 @@
     };
 
     /**
+     * Get headers with CSRF token for SillyTavern API calls
+     */
+    function getSafeRequestHeaders() {
+        // Check if getRequestHeaders is available (SillyTavern function)
+        if (typeof getRequestHeaders === 'function') {
+            try {
+                return getRequestHeaders();
+            } catch (error) {
+                console.error('Discord Connect: Error getting request headers:', error);
+            }
+        }
+        
+        // Fallback: return basic headers
+        console.warn('Discord Connect: getRequestHeaders() not available, using fallback headers');
+        return {
+            'Content-Type': 'application/json'
+        };
+    }
+
+    /**
+     * Diagnostic function to check CSRF token availability
+     */
+    function checkCSRFTokenAvailability() {
+        console.log('=== Discord Connect CSRF Diagnostic ===');
+        console.log('getRequestHeaders available:', typeof getRequestHeaders === 'function');
+        
+        if (typeof getRequestHeaders === 'function') {
+            try {
+                const headers = getRequestHeaders();
+                console.log('Headers obtained:', Object.keys(headers));
+                console.log('Has X-CSRF-Token:', 'X-CSRF-Token' in headers || 'x-csrf-token' in headers);
+            } catch (error) {
+                console.error('Error calling getRequestHeaders:', error);
+            }
+        }
+        
+        console.log('Extension name:', extensionName);
+        console.log('Current settings:', { ...settings, botToken: settings.botToken ? '***' : '' });
+        console.log('======================================');
+    }
+
+    /**
      * Load extension settings
      */
     async function loadSettings() {
         try {
+            const headers = getSafeRequestHeaders();
+            console.log('Discord Connect: Loading settings with headers:', Object.keys(headers));
+            
             const response = await fetch('/api/settings/get', {
                 method: 'POST',
-                headers: getRequestHeaders(),
+                headers: headers,
                 body: JSON.stringify({ extension_name: extensionName })
             });
             
@@ -35,10 +80,15 @@
                 const data = await response.json();
                 if (data.settings) {
                     settings = { ...settings, ...data.settings };
+                    console.log('Discord Connect: Settings loaded successfully');
                 }
+            } else {
+                console.error('Discord Connect: Failed to load settings, status:', response.status, response.statusText);
+                const errorText = await response.text();
+                console.error('Discord Connect: Error response:', errorText);
             }
         } catch (error) {
-            console.error('Failed to load Discord Connect settings:', error);
+            console.error('Discord Connect: Failed to load settings:', error);
         }
     }
 
@@ -47,16 +97,35 @@
      */
     async function saveSettings() {
         try {
-            await fetch('/api/settings/set', {
+            const headers = getSafeRequestHeaders();
+            console.log('Discord Connect: Saving settings with headers:', Object.keys(headers));
+            
+            const response = await fetch('/api/settings/set', {
                 method: 'POST',
-                headers: getRequestHeaders(),
+                headers: headers,
                 body: JSON.stringify({
                     extension_name: extensionName,
                     settings: settings
                 })
             });
+            
+            if (response.ok) {
+                console.log('Discord Connect: Settings saved successfully');
+            } else {
+                console.error('Discord Connect: Failed to save settings, status:', response.status, response.statusText);
+                const errorText = await response.text();
+                console.error('Discord Connect: Error response:', errorText);
+                
+                // Show error to user
+                if (response.status === 403) {
+                    toastr.error('Failed to save settings: CSRF token error. Please refresh the page.', 'Discord Connect');
+                } else {
+                    toastr.error('Failed to save settings. Check console for details.', 'Discord Connect');
+                }
+            }
         } catch (error) {
-            console.error('Failed to save Discord Connect settings:', error);
+            console.error('Discord Connect: Failed to save settings:', error);
+            toastr.error('Failed to save settings: ' + error.message, 'Discord Connect');
         }
     }
 
@@ -389,6 +458,10 @@
      */
     async function init() {
         console.log('Initializing Discord Connect extension');
+        
+        // Run diagnostic check
+        checkCSRFTokenAvailability();
+        
         await loadSettings();
         createUI();
         
