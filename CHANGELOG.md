@@ -5,6 +5,22 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.0.2] - 2025-01-XX
+
+### Added
+- **Manual Controls**: Added manual buttons for better control over Discord integration
+  - "Send Last AI Response" button - Manually send the most recent AI response to Discord
+  - "Fetch Last Discord Message" button - Manually retrieve and display the latest message from the Discord channel
+  - Both buttons provide user feedback via toast notifications
+- Last message tracking to enable manual operations
+  - `lastAIResponse` variable stores the most recent AI-generated message
+  - `lastDiscordMessage` variable stores the most recent Discord channel message
+
+### Changed
+- Enhanced UI with a "Manual Controls" section in the settings panel
+- AI responses are now tracked even when auto-reply is disabled
+- Improved user experience with informative toast messages for manual actions
+
 ## [1.0.1] - 2025-01-XX
 
 ### Fixed

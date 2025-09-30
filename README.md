@@ -11,6 +11,7 @@ A SillyTavern extension that connects Discord to SillyTavern, allowing you to:
 - 💬 **Bidirectional Communication**: Messages flow from Discord to SillyTavern and AI responses go back to Discord
 - ⚙️ **Auto-Reply**: Optionally enable automatic AI responses to Discord messages
 - 🎛️ **Easy Configuration**: Simple UI in SillyTavern's extension settings
+- 🔘 **Manual Controls**: Send last AI response or fetch last Discord message with dedicated buttons
 
 ## Architecture
 
@@ -89,6 +90,28 @@ Once connected:
 
 1. **Discord to SillyTavern**: Any message sent in the configured Discord channel (by non-bot users) will appear in your SillyTavern chat
 2. **SillyTavern to Discord**: AI responses generated in SillyTavern will automatically be sent back to the Discord channel
+
+### Auto-Reply Mode
+
+When "Auto-reply to Discord messages" is enabled:
+- Every message from Discord automatically triggers an AI response
+- The AI response is automatically sent back to Discord
+
+### Manual Controls
+
+The extension provides manual buttons for fine-grained control:
+
+1. **Send Last AI Response**
+   - Manually send the most recent AI-generated message to Discord
+   - Useful when auto-reply is disabled
+   - Shows a confirmation toast when successful
+
+2. **Fetch Last Discord Message**
+   - Manually retrieve and display the latest message from the Discord channel
+   - Adds the message to your SillyTavern chat
+   - Useful for checking for new messages on demand
+
+These manual controls are always available in the extension settings panel.
 
 ### Example Workflow
 
