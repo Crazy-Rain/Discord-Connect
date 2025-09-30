@@ -1,0 +1,12 @@
+{
+  "display_name": "Discord Connect",
+  "loading_order": 1000,
+  "requires": [],
+  "optional": [],
+  "js": "index.js",
+  "css": "style.css",
+  "author": "Crazy-Rain",
+  "version": "1.0.0",
+  "homePage": "https://github.com/Crazy-Rain/Discord-Connect",
+  "auto_update": true
+}
