@@ -10,7 +10,12 @@
 - "Failed to connect to Discord" error despite correct configuration
 
 #### Solution
-This issue has been **fixed in the latest version** of the extension. The extension now properly includes CSRF tokens in all API requests to SillyTavern.
+This issue has been **comprehensively fixed in the latest version** of the extension. The extension now properly includes CSRF tokens in **all** API requests:
+
+**Fixed in Latest Version:**
+- ✅ Settings API calls (`/api/settings/get`, `/api/settings/set`)
+- ✅ Discord Connect API calls (`/api/discord-connect/start`, `/api/discord-connect/stop`, `/api/discord-connect/messages`, `/api/discord-connect/send`)
+- ✅ All API endpoints now use `getSafeRequestHeaders()` which includes CSRF tokens
 
 **If you're still experiencing this issue:**
 
@@ -31,21 +36,30 @@ This issue has been **fixed in the latest version** of the extension. The extens
    - Hard refresh the SillyTavern page (Ctrl+Shift+R or Cmd+Shift+R)
    - Check the console again for the diagnostic information
 
-4. **Re-enter your settings**
+4. **Re-enter your settings and try connecting**
    - Enter your bot token and channel ID
-   - Watch the console for messages like "Discord Connect: Saving settings with headers:"
+   - Watch the console for messages like:
+     - `Discord Connect: Saving settings with headers:`
+     - `Discord Connect: Starting Discord bot with headers:`
    - If you see an error about CSRF tokens, a toast notification will appear
 
 5. **Check for error notifications**
    - The extension now shows toast notifications when save operations fail
    - If you see "Failed to save settings: CSRF token error", refresh the page
+   - If you see "Failed to connect to Discord" with a 403 error, check the console for CSRF-related messages
    - If errors persist, check SillyTavern logs for more details
 
 **Technical Details:**
-The extension uses SillyTavern's `getRequestHeaders()` function which automatically includes the required CSRF token. If this function is not available, the extension will:
+The extension uses SillyTavern's `getRequestHeaders()` function which automatically includes the required CSRF token in all API calls. If this function is not available, the extension will:
 - Log a warning in the console
 - Use fallback headers (without CSRF token)
 - Display error notifications when API calls fail
+
+All Discord Connect endpoints now include proper CSRF token handling:
+- `/api/discord-connect/start` - Starting the Discord bot
+- `/api/discord-connect/stop` - Stopping the Discord bot
+- `/api/discord-connect/messages` - Fetching Discord messages
+- `/api/discord-connect/send` - Sending messages to Discord
 
 **Debug Commands (in Browser Console):**
 ```javascript
