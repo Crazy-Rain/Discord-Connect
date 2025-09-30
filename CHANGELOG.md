@@ -8,13 +8,25 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [1.0.3] - 2025-01-XX
 
 ### Fixed
-- **Critical**: Enhanced CSRF token error handling and diagnostics
+- **Critical**: Comprehensive CSRF token handling for all API endpoints
+  - Added CSRF token headers to all Discord Connect API calls (`/api/discord-connect/*`)
+  - Fixed `/api/discord-connect/start` - Now includes CSRF headers when starting bot
+  - Fixed `/api/discord-connect/stop` - Now includes CSRF headers when stopping bot
+  - Fixed `/api/discord-connect/messages` - Now includes CSRF headers when fetching messages
+  - Fixed `/api/discord-connect/send` - Now includes CSRF headers when sending messages
+  - Previously only settings API calls (`/api/settings/*`) included CSRF tokens
+  - Enhanced CSRF token error handling and diagnostics
   - Added defensive checks for `getRequestHeaders()` availability
   - Added fallback header generation if `getRequestHeaders()` is unavailable
   - Extension now detects and logs when CSRF token functionality is missing
   - Save/load operations now provide detailed error feedback to users
 
 ### Added
+- **Enhanced Logging**: Added detailed logging for Discord Connect operations
+  - `Discord Connect: Starting Discord bot with headers:` - Shows headers used when connecting
+  - `Discord Connect: Bot connected successfully` - Confirms successful connection
+  - `Discord Connect: Failed to start bot, status:` - Detailed error information
+  - Console logging helps identify CSRF token and connection issues
 - **Diagnostic Tools**: New CSRF token availability checker runs on extension initialization
   - Logs detailed diagnostic information to browser console
   - Shows which headers are available and being used
@@ -25,10 +37,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - Console logging with "Discord Connect:" prefix for easy filtering
   
 ### Changed
+- All API endpoints now use `getSafeRequestHeaders()` which includes CSRF tokens
+- `connectDiscord()` now logs headers being used and provides detailed error information
+- `disconnectDiscord()` now includes CSRF token headers
+- `startMessagePolling()` now includes CSRF token headers for message fetching
+- `sendToDiscord()` now includes CSRF token headers for sending messages
+- `manualFetchLastMessage()` now includes CSRF token headers
 - `loadSettings()` now logs detailed error information and response status
 - `saveSettings()` now validates response status and shows user notifications on failure
 - Better error messages with actionable steps for users
-- Enhanced troubleshooting documentation with step-by-step debugging guide
+- Enhanced troubleshooting documentation with comprehensive CSRF error resolution guide
 
 ## [1.0.2] - 2025-01-XX
 
