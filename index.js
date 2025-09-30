@@ -145,9 +145,11 @@
 
         try {
             // Call backend to start Discord bot
+            const headers = getSafeRequestHeaders();
+            console.log('Discord Connect: Starting Discord bot with headers:', Object.keys(headers));
             const response = await fetch('/api/discord-connect/start', {
                 method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
+                headers: headers,
                 body: JSON.stringify({
                     token: settings.botToken,
                     channelId: settings.channelId
@@ -160,11 +162,14 @@
                 await saveSettings();
                 updateConnectionStatus();
                 toastr.success('Discord bot connected successfully', 'Discord Connect');
+                console.log('Discord Connect: Bot connected successfully');
                 
                 // Start polling for messages
                 startMessagePolling();
             } else {
                 const error = await response.text();
+                console.error('Discord Connect: Failed to start bot, status:', response.status, response.statusText);
+                console.error('Discord Connect: Error response:', error);
                 throw new Error(error);
             }
         } catch (error) {
@@ -182,8 +187,10 @@
         }
 
         try {
+            const headers = getSafeRequestHeaders();
             await fetch('/api/discord-connect/stop', {
-                method: 'POST'
+                method: 'POST',
+                headers: headers
             });
             
             isConnected = false;
@@ -212,7 +219,11 @@
             }
 
             try {
-                const response = await fetch('/api/discord-connect/messages');
+                const headers = getSafeRequestHeaders();
+                const response = await fetch('/api/discord-connect/messages', {
+                    method: 'GET',
+                    headers: headers
+                });
                 if (response.ok) {
                     const messages = await response.json();
                     
@@ -285,9 +296,10 @@
         }
 
         try {
+            const headers = getSafeRequestHeaders();
             await fetch('/api/discord-connect/send', {
                 method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
+                headers: headers,
                 body: JSON.stringify({ content })
             });
             
@@ -331,7 +343,11 @@
 
         try {
             // Poll for messages once
-            const response = await fetch('/api/discord-connect/messages');
+            const headers = getSafeRequestHeaders();
+            const response = await fetch('/api/discord-connect/messages', {
+                method: 'GET',
+                headers: headers
+            });
             if (response.ok) {
                 const messages = await response.json();
                 
