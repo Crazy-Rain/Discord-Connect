@@ -5,6 +5,22 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.0.1] - 2025-01-XX
+
+### Fixed
+- **Critical**: Fixed CSRF token error that prevented settings from being saved
+  - Extension now properly uses `getRequestHeaders()` for all SillyTavern API calls
+  - Settings (bot token and channel ID) now persist correctly after page refresh
+  - Resolves "ForbiddenError: Invalid CSRF token" error in SillyTavern console
+- Connection state (enabled/disabled) now properly saved and restored
+  - `connectDiscord()` sets and saves enabled state
+  - `disconnectDiscord()` sets and saves disabled state
+
+### Changed
+- Updated `loadSettings()` to include CSRF token headers
+- Updated `saveSettings()` to include CSRF token headers
+- Enhanced troubleshooting documentation with CSRF error resolution
+
 ## [1.0.0] - 2025-09-30
 
 ### Added

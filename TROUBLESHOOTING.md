@@ -2,7 +2,26 @@
 
 ## Common Issues and Solutions
 
-### 1. Bot Won't Connect
+### 1. CSRF Token Error (ForbiddenError: Invalid CSRF token)
+
+#### Symptom
+- Error message in SillyTavern console: "ForbiddenError: Invalid CSRF token. Please refresh the page and try again."
+- Settings (bot token and channel ID) are wiped when page is refreshed
+- "Failed to connect to Discord" error despite correct configuration
+
+#### Solution
+This issue has been **fixed in the latest version** of the extension. The extension now properly includes CSRF tokens in all API requests to SillyTavern.
+
+**If you're still experiencing this issue:**
+1. Update to the latest version of the Discord Connect extension
+2. Clear your browser cache
+3. Refresh the SillyTavern page (Ctrl+Shift+R or Cmd+Shift+R)
+4. Re-enter your bot token and channel ID
+
+**Technical Details:**
+The extension now uses SillyTavern's `getRequestHeaders()` function which automatically includes the required CSRF token for all API calls. This ensures settings are properly saved and persist across page refreshes.
+
+### 2. Bot Won't Connect
 
 #### Symptom
 Clicking "Connect" shows error message or status stays "Disconnected"
@@ -38,7 +57,7 @@ cd /path/to/discord-connect
 npm start
 ```
 
-### 2. Messages Not Appearing in SillyTavern
+### 3. Messages Not Appearing in SillyTavern
 
 #### Symptom
 Messages sent in Discord don't show up in SillyTavern chat
@@ -64,7 +83,7 @@ Messages sent in Discord don't show up in SillyTavern chat
 **D. Auto-Reply Disabled**
 - If you want automatic responses, enable "Auto-reply" in settings
 
-### 3. Responses Not Sent to Discord
+### 4. Responses Not Sent to Discord
 
 #### Symptom
 AI generates response in SillyTavern but doesn't appear in Discord
@@ -89,7 +108,7 @@ AI generates response in SillyTavern but doesn't appear in Discord
 - Wait a few seconds between messages
 - Check server console for rate limit warnings
 
-### 4. Server Won't Start
+### 5. Server Won't Start
 
 #### Symptom
 `npm start` fails or server crashes immediately
@@ -121,7 +140,7 @@ node --version
 # Update if needed
 ```
 
-### 5. Extension Not Loading in SillyTavern
+### 6. Extension Not Loading in SillyTavern
 
 #### Symptom
 Discord Connect doesn't appear in extensions list
@@ -146,23 +165,28 @@ cat manifest.json | python3 -m json.tool
 - Restart SillyTavern
 - Hard refresh (Ctrl+Shift+R or Cmd+Shift+R)
 
-### 6. Settings Not Saving
+### 7. Settings Not Saving
 
 #### Symptom
 Configuration values reset after reload
 
 #### Possible Causes & Solutions
 
-**A. SillyTavern Settings API Issue**
+**A. CSRF Token Issue (Fixed in latest version)**
+- This was a known issue where the extension didn't include CSRF tokens in API calls
+- **Solution**: Update to the latest version of the extension
+- The extension now properly uses `getRequestHeaders()` for all SillyTavern API calls
+
+**B. SillyTavern Settings API Issue**
 - Check SillyTavern console for errors
 - Verify SillyTavern has write permissions in its directory
 
-**B. Browser Blocking**
+**C. Browser Blocking**
 - Check browser console for errors
 - Try different browser
 - Disable browser extensions that might interfere
 
-### 7. High CPU/Memory Usage
+### 8. High CPU/Memory Usage
 
 #### Symptom
 Server or extension using excessive resources
@@ -181,7 +205,7 @@ Server or extension using excessive resources
 - Restart server periodically
 - Report issue on GitHub
 
-### 8. Messages Duplicated
+### 9. Messages Duplicated
 
 #### Symptom
 Same message appears multiple times
@@ -201,7 +225,7 @@ ps aux | grep "node server.js"
 kill <pid>
 ```
 
-### 9. Characters Not Responding
+### 10. Characters Not Responding
 
 #### Symptom
 Messages appear but AI doesn't generate response
@@ -220,7 +244,7 @@ Messages appear but AI doesn't generate response
 **C. Auto-Reply Disabled**
 - Enable auto-reply in Discord Connect settings
 
-### 10. Connection Keeps Dropping
+### 11. Connection Keeps Dropping
 
 #### Symptom
 Status changes from Connected to Disconnected randomly
