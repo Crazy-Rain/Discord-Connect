@@ -13,13 +13,48 @@
 This issue has been **fixed in the latest version** of the extension. The extension now properly includes CSRF tokens in all API requests to SillyTavern.
 
 **If you're still experiencing this issue:**
-1. Update to the latest version of the Discord Connect extension
-2. Clear your browser cache
-3. Refresh the SillyTavern page (Ctrl+Shift+R or Cmd+Shift+R)
-4. Re-enter your bot token and channel ID
+
+1. **First, check the browser console for detailed diagnostic information**
+   - Open SillyTavern in your browser
+   - Press F12 to open Developer Tools
+   - Go to the "Console" tab
+   - Look for messages starting with "Discord Connect:"
+   - Check for the "=== Discord Connect CSRF Diagnostic ===" section
+
+2. **Verify getRequestHeaders is available**
+   - In the console, look for: `getRequestHeaders available: true`
+   - If it shows `false`, this indicates a SillyTavern version incompatibility
+   - Update SillyTavern to the latest version
+
+3. **Clear browser cache and refresh**
+   - Clear your browser cache completely
+   - Hard refresh the SillyTavern page (Ctrl+Shift+R or Cmd+Shift+R)
+   - Check the console again for the diagnostic information
+
+4. **Re-enter your settings**
+   - Enter your bot token and channel ID
+   - Watch the console for messages like "Discord Connect: Saving settings with headers:"
+   - If you see an error about CSRF tokens, a toast notification will appear
+
+5. **Check for error notifications**
+   - The extension now shows toast notifications when save operations fail
+   - If you see "Failed to save settings: CSRF token error", refresh the page
+   - If errors persist, check SillyTavern logs for more details
 
 **Technical Details:**
-The extension now uses SillyTavern's `getRequestHeaders()` function which automatically includes the required CSRF token for all API calls. This ensures settings are properly saved and persist across page refreshes.
+The extension uses SillyTavern's `getRequestHeaders()` function which automatically includes the required CSRF token. If this function is not available, the extension will:
+- Log a warning in the console
+- Use fallback headers (without CSRF token)
+- Display error notifications when API calls fail
+
+**Debug Commands (in Browser Console):**
+```javascript
+// Check if getRequestHeaders is available
+typeof getRequestHeaders === 'function'
+
+// Try to get headers manually
+getRequestHeaders()
+```
 
 ### 2. Bot Won't Connect
 
@@ -270,15 +305,51 @@ Status changes from Connected to Disconnected randomly
 
 ### Enable Detailed Logging
 
-**In bot.js**, add after line 1:
-```javascript
-process.env.DEBUG = 'discord:*';
+**Browser Console (for CSRF and Settings Issues):**
+
+The extension automatically logs diagnostic information when it loads. To view it:
+
+1. Open SillyTavern in your browser
+2. Press F12 to open Developer Tools
+3. Go to the "Console" tab
+4. Refresh the page (Ctrl+R or Cmd+R)
+5. Look for messages starting with "Discord Connect:"
+
+**Key diagnostic messages to look for:**
+```
+=== Discord Connect CSRF Diagnostic ===
+getRequestHeaders available: true/false
+Headers obtained: [list of header names]
+Has X-CSRF-Token: true/false
+Extension name: discord-connect
+Current settings: {...}
+======================================
 ```
 
-**In browser console**, check extension logs:
+**Understanding the diagnostic output:**
+
+- `getRequestHeaders available: false` - SillyTavern version may be too old
+- `Has X-CSRF-Token: false` - CSRF token is not being included (page refresh may be needed)
+- `Discord Connect: Loading/Saving settings with headers:` - Shows which headers are used
+- `Discord Connect: Failed to save settings, status: 403` - CSRF token rejected
+
+**Manual CSRF token check (in console):**
 ```javascript
-// See all console messages
-console.log = console.log;
+// Check if the function exists
+typeof getRequestHeaders === 'function'
+
+// Try to get headers
+try {
+    const headers = getRequestHeaders();
+    console.log('Headers:', headers);
+} catch(e) {
+    console.error('Error:', e);
+}
+```
+
+**In bot.js**, add after line 1 for Discord.js debugging:
+```javascript
+process.env.DEBUG = 'discord:*';
 ```
 
 **In server.js**, add detailed logging:
