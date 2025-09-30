@@ -11,6 +11,8 @@
     
     let discordBotProcess = null;
     let isConnected = false;
+    let lastAIResponse = null;
+    let lastDiscordMessage = null;
     let settings = {
         enabled: false,
         botToken: '',
@@ -161,6 +163,9 @@
     async function handleDiscordMessage(message) {
         console.log('Received Discord message:', message);
         
+        // Store the last Discord message
+        lastDiscordMessage = message;
+        
         // Insert message into chat as user message
         const messageText = `[Discord - ${message.username}]: ${message.content}`;
         
@@ -224,6 +229,61 @@
     }
 
     /**
+     * Manually send the last AI response to Discord
+     */
+    async function manualSendLastResponse() {
+        if (!isConnected) {
+            toastr.warning('Discord not connected', 'Discord Connect');
+            return;
+        }
+
+        if (!lastAIResponse) {
+            toastr.warning('No AI response available to send', 'Discord Connect');
+            return;
+        }
+
+        try {
+            await sendToDiscord(lastAIResponse);
+            toastr.success('Last AI response sent to Discord', 'Discord Connect');
+        } catch (error) {
+            console.error('Error sending last response:', error);
+            toastr.error('Failed to send response to Discord', 'Discord Connect');
+        }
+    }
+
+    /**
+     * Manually fetch and display the last Discord message
+     */
+    async function manualFetchLastMessage() {
+        if (!isConnected) {
+            toastr.warning('Discord not connected', 'Discord Connect');
+            return;
+        }
+
+        try {
+            // Poll for messages once
+            const response = await fetch('/api/discord-connect/messages');
+            if (response.ok) {
+                const messages = await response.json();
+                
+                if (messages.length > 0) {
+                    // Get the last message
+                    const lastMsg = messages[messages.length - 1];
+                    await handleDiscordMessage(lastMsg);
+                    toastr.success('Fetched and added last Discord message', 'Discord Connect');
+                } else {
+                    toastr.info('No new messages in Discord channel', 'Discord Connect');
+                }
+            } else {
+                throw new Error('Failed to fetch messages');
+            }
+        } catch (error) {
+            console.error('Error fetching last message:', error);
+            toastr.error('Failed to fetch Discord message', 'Discord Connect');
+        }
+    }
+
+    /**
      * Update connection status in UI
      */
     function updateConnectionStatus() {
@@ -267,8 +327,21 @@
                     <div class="margin-bot-10px">
                         <span>Status: <span id="discord-connect-status">Disconnected</span></span>
                     </div>
-                    <div>
+                    <div class="margin-bot-10px">
                         <button id="discord-connect-btn" class="menu_button">Connect</button>
+                    </div>
+                    <div class="margin-bot-10px">
+                        <label><b>Manual Controls:</b></label>
+                    </div>
+                    <div class="margin-bot-10px">
+                        <button id="discord-send-last-response-btn" class="menu_button" title="Send the last AI response to Discord">
+                            Send Last AI Response
+                        </button>
+                    </div>
+                    <div>
+                        <button id="discord-fetch-last-message-btn" class="menu_button" title="Fetch and display the last message from Discord channel">
+                            Fetch Last Discord Message
+                        </button>
                     </div>
                 </div>
             </div>
@@ -300,6 +373,14 @@
             }
         });
 
+        $('#discord-send-last-response-btn').on('click', async function() {
+            await manualSendLastResponse();
+        });
+
+        $('#discord-fetch-last-message-btn').on('click', async function() {
+            await manualFetchLastMessage();
+        });
+
         updateConnectionStatus();
     }
 
@@ -328,8 +409,13 @@
             if (isConnected && settings.autoReply && data && data.mes) {
                 // Only send character responses, not user messages
                 if (!data.is_user) {
+                    // Store the last AI response
+                    lastAIResponse = data.mes;
                     await sendToDiscord(data.mes);
                 }
+            } else if (data && data.mes && !data.is_user) {
+                // Store the last AI response even if auto-reply is disabled
+                lastAIResponse = data.mes;
             }
         });
     }
