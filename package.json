@@ -1,0 +1,19 @@
+{
+  "name": "discord-connect",
+  "version": "1.0.0",
+  "description": "Testing out Co-Pilot's capability. Seeing if we can hook SillyTavern to Discord, in some way.",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "node server.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "discord.js": "^14.22.1",
+    "dotenv": "^17.2.3",
+    "express": "^5.1.0"
+  }
+}

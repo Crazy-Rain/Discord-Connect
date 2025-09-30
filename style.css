@@ -1,0 +1,17 @@
+#discord-connect-settings {
+    padding: 10px;
+}
+
+#discord-connect-settings .margin-bot-10px {
+    margin-bottom: 10px;
+}
+
+#discord-connect-status {
+    font-weight: bold;
+}
+
+#discord-connect-btn {
+    width: 100%;
+    padding: 8px;
+    margin-top: 5px;
+}
