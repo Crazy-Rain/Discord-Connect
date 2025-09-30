@@ -25,7 +25,7 @@
         try {
             const response = await fetch('/api/settings/get', {
                 method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
+                headers: getRequestHeaders(),
                 body: JSON.stringify({ extension_name: extensionName })
             });
             
@@ -47,7 +47,7 @@
         try {
             await fetch('/api/settings/set', {
                 method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
+                headers: getRequestHeaders(),
                 body: JSON.stringify({
                     extension_name: extensionName,
                     settings: settings
@@ -85,6 +85,8 @@
 
             if (response.ok) {
                 isConnected = true;
+                settings.enabled = true;
+                await saveSettings();
                 updateConnectionStatus();
                 toastr.success('Discord bot connected successfully', 'Discord Connect');
                 
@@ -114,6 +116,8 @@
             });
             
             isConnected = false;
+            settings.enabled = false;
+            await saveSettings();
             updateConnectionStatus();
             toastr.info('Discord bot disconnected', 'Discord Connect');
         } catch (error) {
